@@ -60,6 +60,3 @@ async function init(){try{if(!window.Cesium||!window.satellite)throw Error('ラ�
   finally{e.target.value='';}
 };useCatalogCache();}catch(err){state(err.message+'。ネットワークと WebGL 対応を確認してください。');}}
 $('settings').onclick=()=>$('dialog').showModal();init();
-
-
-
