@@ -1,0 +1,20 @@
+{
+  "reviewedOn": "2026-10-18",
+  "normalization": "UTF-8 without BOM, CRLF to LF, trim outer whitespace, append one LF",
+  "thirdParty": [
+    {
+      "name": "CesiumJS",
+      "version": "1.146",
+      "file": "dist/licenses/CesiumJS-LICENSE.txt",
+      "source": "https://raw.githubusercontent.com/CesiumGS/cesium/1.146/LICENSE.md",
+      "normalizedSha256": "721844bc0cdaa9b1a9a145dbca1f981e2de15a7e200a5d1fd9f5f1eed8e5d030"
+    },
+    {
+      "name": "satellite.js",
+      "version": "6.0.1",
+      "file": "dist/licenses/satellite-js-LICENSE.txt",
+      "source": "https://raw.githubusercontent.com/shashwatak/satellite-js/6.0.1/LICENSE.md",
+      "normalizedSha256": "68f09159260abc93ae30985052af180e38cc62d16b4ba1f58a98d576fbaa0859"
+    }
+  ]
+}

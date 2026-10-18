@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "license": "MIT",
-  "scripts": { "test": "node --test tests/*.test.cjs" },
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "verify:publication": "node scripts/verify-publication.cjs",
+    "publish:pages": "node scripts/publish-pages.cjs"
+  },
   "engines": { "node": ">=22" }
 }
