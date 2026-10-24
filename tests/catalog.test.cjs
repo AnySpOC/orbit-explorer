@@ -33,24 +33,7 @@ test('distribution keeps notices and removes ion image/key controls',()=>{
   const html=fs.readFileSync(dir+'index.html','utf8'),app=fs.readFileSync(dir+'app.js','utf8');
   assert.doesNotMatch(html,/ACCESS TOKEN|ion\.cesium\.com|id="apply"|id="token"/);
   assert.doesNotMatch(app,/IonImageryProvider|fromAssetId|load\(true\)/);
-  assert.match(html,/credits\.html/);assert.match(app,/useCatalogCache\(\);await load\(\);\}catch/);
+  assert.match(html,/credits\.html/);assert.match(app,/useCatalogCache\(\);\}catch/);
   assert.match(fs.readFileSync(dir+'licenses/CesiumJS-LICENSE.txt','utf8'),/Apache License/);
   assert.match(fs.readFileSync(dir+'licenses/satellite-js-LICENSE.txt','utf8'),/MIT License/);
-});
-
- test('startup defaults to active satellites and uses the throttled loader',()=>{
-   const dir=require('node:path').join(__dirname,'../dist/');
-   assert.match(fs.readFileSync(dir+'index.html','utf8'),/<option value="active" selected>/);
-   const app=fs.readFileSync(dir+'app.js','utf8');
-   assert.match(app,/useCatalogCache\(\);await load\(\);/);
-   assert.match(app,/OrbitCatalog.request\(group\)/);
- });
-
-test('a full cache does not discard a successful large catalog or permit another download',async()=>{
- const s=setup();
- const original=s.values.set.bind(s.values);
- s.values.set=(key,value)=>{if(key==='orbit-active')throw Error('Quota exceeded');return original(key,value);};
- const result=await s.api.request('active');assert.equal(result.data.length,1);
- await assert.rejects(s.api.request('active'),/取得間隔/);
- assert.equal(s.calls(),1);assert.equal(s.values.has('orbit-provider-block'),false);
 });

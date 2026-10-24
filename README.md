@@ -4,7 +4,7 @@ A 3D satellite and space debris viewer built with CesiumJS and satellite.js.
 
 [Live demo](https://anyspoc.github.io/orbit-explorer/)
 
-Active satellites load automatically on startup. Select another catalog or import an OMM JSON file. Positions are estimates from orbital elements, not live observations.
+Click **データ取得** (Fetch data) to load a catalog, or import an OMM JSON file. Positions are estimates from orbital elements, not live observations.
 
 ## Run locally
 

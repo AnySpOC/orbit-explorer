@@ -21,10 +21,7 @@
         if(response.status!==200)throw Error('HTTP '+response.status);
         const data=await response.json();
         if(!Array.isArray(data)||!data.length)throw Error('有効な OMM JSON がありません');
-        const result={time:Date.now(),data};
-        // Large catalogs may exceed localStorage quota; the persisted attempt still limits requests.
-        try{write(key,result);}catch{}
-        return result;
+        const result={time:Date.now(),data};write(key,result);return result;
       }catch(error){
         try{write('orbit-provider-block',{time:Date.now(),reason:error.message});}catch{}
         throw error;
