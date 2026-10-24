@@ -20,7 +20,7 @@ const html=read('dist/index.html');
 for(const match of html.matchAll(/(?:src|href)="([^"#]+)"/g)){
   const url=match[1];if(/^(https?:|data:)/.test(url))continue;
   assert.ok(!url.startsWith('/'),'Use project-relative URLs for GitHub Pages');
-  assert.ok(fs.existsSync(path.join(root,'dist',url)),'Missing linked resource: '+url);
+  assert.ok(fs.existsSync(path.join(root,'dist',url.split('?')[0])),'Missing linked resource: '+url);
 }
 const files=[];
 function walk(dir){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
