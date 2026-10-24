@@ -1,0 +1,24 @@
+SPACE-TRACK BASIC SSA DATA — SOURCE AND REDISTRIBUTION NOTICE
+
+Source: USSPACECOM, via Space-Track.org (https://www.space-track.org/).
+Unclassified basic SSA Orbital Mean-element Messages (OMMs), supplied by the
+project owner as all.xml on 2026-10-24. Source XML SHA-256:
+aef708394fdc4316799decc740776c06b09bd65eded47f0240baf6597caec392
+
+Space-Track's official documentation states that USSPACECOM provides blanket
+approval for transfer/redistribution of basic SSA data accessed via
+Space-Track.org, conditioned on appropriate citation. This includes OMMs.
+https://www.space-track.org/documentation#/odr
+Checked: 2026-10-24.
+
+This data is separate from the application's MIT license. No MIT license
+or endorsement by USSPACECOM or Space-Track.org is asserted for this data.
+
+The XML was converted to JSON with the orbital elements and object types
+retained. Extra catalog metadata was omitted. All 32,422 supplied records
+are included; this is not a complete inventory of all objects in space.
+Reference time for visualization: 2026-10-24T02:17:21Z (11:17:21 JST).
+Element epochs range from 2026-10-14 to 2026-10-26, including future-dated
+reference epochs. These are the supplied elements, not observations at a
+single common instant. Positions are estimated using satellite.js SGP4.
+No operational accuracy, flight-safety suitability, or completeness is asserted.
