@@ -28,7 +28,7 @@ function appHarness(){
   const color={withAlpha(){return this;}};let removed=0;
   const context={console,Date,Math,Number,String,Map,document:{getElementById:node},window:{},
     satellite:{json2satrec:d=>d,propagate:()=>({position:{x:1,y:2,z:3},velocity:{x:1,y:2,z:3}}),gstime:()=>0,eciToEcf:p=>p,eciToGeodetic:()=>({height:500})},
-    Cesium:{Cartesian3:Vec,PointPrimitiveCollection:class{add(o){return o;}},Color:{BLACK:color,fromCssColorString:()=>color},JulianDate:{toDate:d=>d}},
+    Cesium:{NearFarScalar:class{constructor(near,nearValue,far,farValue){Object.assign(this,{near,nearValue,far,farValue});}},Cartesian3:Vec,PointPrimitiveCollection:class{add(o){return o;}},Color:{BLACK:color,fromCssColorString:()=>color},JulianDate:{toDate:d=>d}},
     testViewer:{scene:{primitives:{remove(){removed++;},add:c=>c}},entities:{remove(){}},clock:{currentTime:new Date()}},
     OrbitCatalog:{},testFixture:fixture()};
   vm.createContext(context);vm.runInContext(source,context);
