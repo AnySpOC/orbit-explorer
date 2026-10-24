@@ -30,9 +30,19 @@ function walk(dir){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
 walk(path.join(root,'dist'));
 const secretPatterns=[/-----BEGIN [A-Z ]*PRIVATE KEY-----/,/gh[pousr]_[A-Za-z0-9]{20,}/,/art_v2_[A-Za-z0-9_]+/];
 for(const file of files){
-  assert.ok(!/\.json$/i.test(file),'Do not bundle orbital data JSON in the public app');
+  assert.ok(!/\.json$/i.test(file)||path.relative(root,file).replace(/\\/g,'/')==='dist/data/snapshot.json','Only the reviewed snapshot JSON may be bundled');
   assert.ok(!secretPatterns.some(re=>re.test(fs.readFileSync(file,'utf8'))),'Potential secret in public artifact');
 }
 assert.ok(!fs.existsSync(path.join(root,'dist','.openai')));
 assert.ok(!fs.existsSync(path.join(root,'dist','.git')));
 console.log('Publication verification passed: '+files.length+' static files; license hashes, relative links, and exclusions checked.');
+
+const snapshotLock=JSON.parse(read('snapshot.lock.json'));
+assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,snapshotLock.file))).digest('hex'),snapshotLock.sha256);
+const snapshot=JSON.parse(read(snapshotLock.file));
+require('../dist/validation.js');
+assert.equal(OrbitValidation.catalog(snapshot.objects).length,snapshotLock.count);
+assert.equal(snapshot.metadata.referenceTime,snapshotLock.referenceTime);
+assert.match(read('dist/licenses/SPACE-TRACK-DATA.txt'),/USSPACECOM/);
+assert.match(read('dist/credits.html'),/SPACE-TRACK-DATA.txt/);
+console.log('Reviewed Space-Track snapshot verified: '+snapshotLock.count+' objects.');

@@ -1,7 +1,7 @@
 /* Copyright (c) 2026 AnySpOC. MIT License; see licenses/ORBIT-MIT.txt. */
 (function(root){
   'use strict';
-  const MAX_OBJECTS=25000,MAX_FILE_BYTES=12*1024*1024;
+  const MAX_OBJECTS=50000,MAX_FILE_BYTES=32*1024*1024;
   function number(value,name,min,max,maxExclusive=false){
     if((typeof value!=='number'&&typeof value!=='string')||String(value).trim()==='')throw Error(name+' が不正です');
     const n=Number(value);
@@ -20,7 +20,7 @@
     for(const [field,expected] of [['TIME_SYSTEM','UTC'],['REF_FRAME','TEME'],['MEAN_ELEMENT_THEORY','SGP4']]){
       if(d[field]!==undefined&&d[field]!==expected)throw Error(field+' は '+expected+' のみ対応しています');
     }
-    const result={OBJECT_NAME:d.OBJECT_NAME.trim(),NORAD_CAT_ID:id,EPOCH:utc.slice(0,-1)};
+    const result={OBJECT_TYPE:['PAYLOAD','DEBRIS','ROCKET BODY','UNKNOWN'].includes(d.OBJECT_TYPE)?d.OBJECT_TYPE:'UNKNOWN',OBJECT_NAME:d.OBJECT_NAME.trim(),NORAD_CAT_ID:id,EPOCH:utc.slice(0,-1)};
     result.MEAN_MOTION=number(d.MEAN_MOTION,'平均運動',Number.MIN_VALUE,30);
     result.ECCENTRICITY=number(d.ECCENTRICITY,'離心率',0,1,true);
     result.INCLINATION=number(d.INCLINATION,'軌道傾斜角',0,180);

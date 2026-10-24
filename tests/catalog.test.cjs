@@ -2,38 +2,11 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const fs=require('node:fs');
-const source=fs.readFileSync(require('node:path').join(__dirname,'../dist/catalog.js'),'utf8');
-function setup(status=200,storageFails=false){
-  const values=new Map();let calls=0;
-  const sandbox={Map,Date,JSON,Error,navigator:{},AbortSignal:{timeout:()=>undefined},localStorage:{getItem:k=>values.get(k)||null,setItem:(k,v)=>{if(storageFails)throw Error('Storage unavailable');values.set(k,v);}},fetch:async()=>{calls++;return {status,json:async()=>[{OBJECT_NAME:'fixture'}]};}};
-  vm.runInNewContext(source,sandbox);
-  return {api:sandbox.OrbitCatalog,values,calls:()=>calls};
-}
-test('loading the module never requests orbital data',()=>{assert.equal(setup().calls(),0);});
-test('manual requests reuse the cached update and cannot force another request',async()=>{
-  const s=setup();await s.api.request('stations');await s.api.request('stations');
-  assert.equal(s.calls(),1);
-});
-test('GP and GPS use conservative update intervals',()=>{
-  const s=setup();assert.equal(s.api.interval('stations'),7200000);assert.equal(s.api.interval('gps-ops'),86400000);
-});
-for(const status of [301,403,404,429,500,503])test('HTTP '+status+' stops all subsequent provider requests',async()=>{
-  const s=setup(status);await assert.rejects(s.api.request('stations'),new RegExp('HTTP '+status));
-  await assert.rejects(s.api.request('geo'),/取得を停止中/);assert.equal(s.calls(),1);
-});
-test('persistent storage failure prevents an unthrottled request',async()=>{
-  const s=setup(200,true);await assert.rejects(s.api.request('stations'),/Storage unavailable/);assert.equal(s.calls(),0);
-});
-test('a recent attempt prevents another request even without cached payload',async()=>{
-  const s=setup();s.values.set('orbit-stations-attempt',JSON.stringify({time:Date.now()}));
-  await assert.rejects(s.api.request('stations'),/取得間隔/);assert.equal(s.calls(),0);
-});
-test('distribution keeps notices and removes ion image/key controls',()=>{
-  const dir=require('node:path').join(__dirname,'../dist/');
-  const html=fs.readFileSync(dir+'index.html','utf8'),app=fs.readFileSync(dir+'app.js','utf8');
-  assert.doesNotMatch(html,/ACCESS TOKEN|ion\.cesium\.com|id="apply"|id="token"/);
-  assert.doesNotMatch(app,/IonImageryProvider|fromAssetId|load\(true\)/);
-  assert.match(html,/credits\.html/);assert.match(app,/useCatalogCache\(\);\}catch/);
-  assert.match(fs.readFileSync(dir+'licenses/CesiumJS-LICENSE.txt','utf8'),/Apache License/);
-  assert.match(fs.readFileSync(dir+'licenses/satellite-js-LICENSE.txt','utf8'),/MIT License/);
-});
+const path=require('node:path');
+const source=fs.readFileSync(path.join(__dirname,'../dist/catalog.js'),'utf8');
+function setup(status=200){let calls=[];const sandbox={Date,Error,fetch:async(url)=>{calls.push(url);return {status,json:async()=>({metadata:{referenceTime:'2026-10-24T02:17:21Z',count:3},objects:[{OBJECT_TYPE:'PAYLOAD'},{OBJECT_TYPE:'DEBRIS'},{OBJECT_TYPE:'ROCKET BODY'}]})};}};vm.runInNewContext(source,sandbox);return {api:sandbox.OrbitCatalog,calls};}
+test('catalog module does not fetch until requested',()=>assert.equal(setup().calls.length,0));
+test('all groups and concurrent requests share one bundled download, never an external API',async()=>{const s=setup();const [all,debris]=await Promise.all([s.api.request('all'),s.api.request('debris')]);assert.equal(all.data.length,3);assert.equal(debris.data.length,1);assert.equal((await s.api.request('rocket')).data.length,1);assert.deepEqual(s.calls,['data/snapshot.json']);assert.equal(s.api.cached('all').data.length,3);});
+test('a failed snapshot load is not retried automatically',async()=>{const s=setup(404);await assert.rejects(s.api.request('all'),/HTTP 404/);await assert.rejects(s.api.request('all'));assert.equal(s.calls.length,1);});
+test('unsupported groups cannot issue a request',async()=>{const s=setup();await assert.rejects(s.api.request('active'));assert.equal(s.calls.length,0);});
+test('startup is frozen at the snapshot date and reset restores that date',()=>{const app=fs.readFileSync(path.join(__dirname,'../dist/app.js'),'utf8');assert.match(app,/shouldAnimate:false/);assert.match(app,/await load\(\);\}catch/);assert.match(app,/JulianDate.fromDate\(referenceTime\)/);assert.doesNotMatch(app,/JulianDate.now\(/);const html=fs.readFileSync(path.join(__dirname,'../dist/index.html'),'utf8');assert.match(html,/<option value="all" selected>/);assert.doesNotMatch(html,/celestrak/i);});
